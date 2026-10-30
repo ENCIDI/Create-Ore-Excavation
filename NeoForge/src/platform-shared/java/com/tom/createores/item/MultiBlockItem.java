@@ -31,11 +31,13 @@ public class MultiBlockItem extends BlockItem {
 		Direction facing = pState.getValue(BlockStateProperties.HORIZONTAL_FACING);
 		BlockPos place = pContext.getClickedPos().offset(part.getStart(facing));
 		Vec3i s = part.getSize(facing);
+		BlockPos controller = null;
 		for(int x = 0;x<s.getX();x++) {
 			for(int y = 0;y<s.getY();y++) {
 				for(int z = 0;z<s.getZ();z++) {
 					BlockPos pos = place.offset(x, y, z);
 					MultiblockPartType type = part.getPartTypeAt(facing, x, y, z);
+					if(type == MultiblockPartType.MAIN)controller = pos;
 					if(type != null) {
 						if(pContext.getLevel().isOutsideBuildHeight(pos))return false;
 						BlockPlaceContext p = BlockPlaceContext.at(pContext, pos.below(), Direction.UP);
@@ -49,7 +51,7 @@ public class MultiBlockItem extends BlockItem {
 				}
 			}
 		}
-		return true;
+		return controller == null || part.canPlaceAt(pContext, controller);
 	}
 
 	@Override

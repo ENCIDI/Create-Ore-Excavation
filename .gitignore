@@ -1,0 +1,42 @@
+# Gradle
+.gradle/
+build/
+out/
+bin/
+
+# Minecraft run directories (NeoGradle / Loom)
+run/
+runs/
+logs/
+*.log
+crash-reports/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.eclipse/
+.classpath
+.project
+.settings/
+*.launch
+
+# VS Code
+.vscode/
+
+# Java
+*.class
+*.hprof
+hs_err_pid*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local AI tooling
+.claude/
+.serena/

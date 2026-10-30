@@ -11,27 +11,19 @@ public class NetworkHandler {
 
 	@SubscribeEvent
 	public static void onPayloadRegister(RegisterPayloadHandlersEvent event) {
-		PayloadRegistrar registrar = event.registrar("1");
-		registrar.playToServer(OreVeinAtlasClickPacket.ID, OreVeinAtlasClickPacket.STREAM_CODEC, NetworkHandler::handlePacketServer);
-		registrar.playToClient(OreVeinInfoPacket.ID, OreVeinInfoPacket.STREAM_CODEC, NetworkHandler::handlePacketClient);
+		PayloadRegistrar registrar = event.registrar("2");
+		registrar.playToClient(DrillConfigPacket.ID, DrillConfigPacket.STREAM_CODEC, NetworkHandler::handlePacketClient);
 	}
 
 	public static void handlePacketClient(Packet packet, IPayloadContext context) {
 		context.enqueueWork(packet::handleClient);
 	}
 
-	public static void handlePacketServer(Packet packet, IPayloadContext context) {
-		context.enqueueWork(() -> {
-			ServerPlayer sender = (ServerPlayer) context.player();
-			packet.handleServer(sender);
-		});
-	}
-
-	public static void sendDataToServer(Packet packet) {
-		PacketDistributor.sendToServer(packet);
-	}
-
 	public static void sendTo(ServerPlayer player, Packet packet) {
 		PacketDistributor.sendToPlayer(player, packet);
+	}
+
+	public static void sendToAll(Packet packet) {
+		PacketDistributor.sendToAllPlayers(packet);
 	}
 }

@@ -12,6 +12,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -178,6 +179,14 @@ public interface MultiblockPart extends IWrenchable {
 		}
 
 		Vec3i getStart(Direction facing);
+
+		/**
+		 * Extra placement rules, called after the space for every part was found free.
+		 * @param controller position the main block will be placed at
+		 */
+		public default boolean canPlaceAt(BlockPlaceContext context, BlockPos controller) {
+			return true;
+		}
 
 		public default MultiblockPartType getPartTypeAt(Direction facing, int x, int y, int z) {
 			Vec3i size = getSize(facing);

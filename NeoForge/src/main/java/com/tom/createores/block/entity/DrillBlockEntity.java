@@ -5,18 +5,19 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 
-import com.tom.createores.CreateOreExcavation;
-import com.tom.createores.recipe.DrillingRecipe;
+import com.tom.createores.DrillConfig;
+import com.tom.createores.DrillConfig.DimensionTable;
+import com.tom.createores.DrillConfig.Tier;
 import com.tom.createores.util.IOBlockType;
 import com.tom.createores.util.QueueInventory;
 
-public class DrillBlockEntity extends ExcavatingBlockEntityImpl<DrillingRecipe> {
+public class DrillBlockEntity extends ExcavatingBlockEntityImpl {
 	private QueueInventory inventory;
 
 	public DrillBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -57,18 +58,14 @@ public class DrillBlockEntity extends ExcavatingBlockEntityImpl<DrillingRecipe> 
 	}
 
 	@Override
-	protected boolean canExtract() {
-		return inventory.hasSpace() && super.canExtract();
+	protected boolean canExtract(DimensionTable dimension) {
+		return inventory.hasSpace() && super.canExtract(dimension);
 	}
 
 	@Override
-	protected void onFinished() {
-		current.value().getOutput().stream().map(o -> o.rollOutput(level.random)).filter(i -> !i.isEmpty()).forEach(inventory::add);
-		super.onFinished();
-	}
-
-	@Override
-	protected RecipeType<DrillingRecipe> getRecipeType() {
-		return CreateOreExcavation.DRILLING_RECIPES.getRecipeType();
+	protected void onFinished(Tier tier, DimensionTable dimension) {
+		ItemStack drop = DrillConfig.get().roll(tier, dimension, level.random);
+		if(!drop.isEmpty())inventory.add(drop);
+		super.onFinished(tier, dimension);
 	}
 }

@@ -24,12 +24,8 @@ public class COEPonderPlugin implements PonderPlugin {
 	public void registerScenes(PonderSceneRegistrationHelper<ResourceLocation> helper) {
 		PonderSceneRegistrationHelper<ItemProviderEntry<?, ?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
 
-		HELPER.forComponents(Registration.DRILL_BLOCK, Registration.EXTRACTOR_BLOCK)
+		HELPER.forComponents(Registration.DRILL_BLOCK)
 		.addStoryBoard("drilling_machine", PonderScenes::drillingMachine, AllCreatePonderTags.KINETIC_SOURCES, DRILLING);
-
-		HELPER.forComponents(Registration.VEIN_FINDER_ITEM, Registration.SAMPLE_DRILL_BLOCK, Registration.VEIN_ATLAS_ITEM)
-		.addStoryBoard("vein_finder", PonderScenes::oreFinder, AllCreatePonderTags.KINETIC_SOURCES, DRILLING)
-		.addStoryBoard("sample_drill", PonderScenes::sampleDrill, DRILLING);
 	}
 
 	@Override
@@ -44,7 +40,6 @@ public class COEPonderPlugin implements PonderPlugin {
 		PonderTagRegistrationHelper<RegistryEntry<?, ?>> HELPER = helper.withKeyFunction(RegistryEntry::getId);
 
 		HELPER.addToTag(AllCreatePonderTags.KINETIC_APPLIANCES).
-		add(Registration.DRILL_BLOCK).
-		add(Registration.EXTRACTOR_BLOCK);
+		add(Registration.DRILL_BLOCK);
 	}
 }

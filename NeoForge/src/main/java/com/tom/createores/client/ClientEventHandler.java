@@ -31,7 +31,7 @@ public class ClientEventHandler {
 			return;
 
 		ItemStack stack = event.getItemStack();
-		if(stack.getItem() == Registration.DRILL_BLOCK.get().asItem() || stack.getItem() == Registration.EXTRACTOR_BLOCK.get().asItem()) {
+		if(stack.getItem() == Registration.DRILL_BLOCK.get().asItem()) {
 			appendVariableStress(event.getToolTip());
 		}
 	}

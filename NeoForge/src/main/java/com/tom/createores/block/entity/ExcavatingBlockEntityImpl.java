@@ -11,14 +11,17 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
-import com.tom.createores.recipe.ExcavatingRecipe;
+import com.tom.createores.DrillConfig;
+import com.tom.createores.DrillConfig.DimensionTable;
+import com.tom.createores.DrillConfig.Tier;
 import com.tom.createores.util.IOBlockType;
 import com.tom.createores.util.TooltipUtil;
 
-public abstract class ExcavatingBlockEntityImpl<R extends ExcavatingRecipe> extends ExcavatingBlockEntity<R> {
+public abstract class ExcavatingBlockEntityImpl extends ExcavatingBlockEntity {
 	protected FluidTank fluidTank;
 
 	protected ExcavatingBlockEntityImpl(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -43,52 +46,37 @@ public abstract class ExcavatingBlockEntityImpl<R extends ExcavatingRecipe> exte
 	@Override
 	protected void read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
 		super.read(tag, registries, clientPacket);
-		fluidTank.readFromNBT(registries, tag.getCompound(getTankInName()));
+		fluidTank.readFromNBT(registries, tag.getCompound("tank"));
 	}
 
 	@Override
 	public void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
 		super.write(tag, registries, clientPacket);
-		tag.put(getTankInName(), fluidTank.writeToNBT(registries, new CompoundTag()));
+		tag.put("tank", fluidTank.writeToNBT(registries, new CompoundTag()));
 	}
 
 	@Override
 	public boolean addToGoggleTooltip(List<Component> tooltip, boolean isPlayerSneaking) {
 		super.addToGoggleTooltip(tooltip, isPlayerSneaking);
-		TooltipUtil.forGoggles(tooltip, Component.translatable("info.coe.drill.fluidInfo"));
-		containedFluidTooltip(tooltip, isPlayerSneaking, fluidTank);
+		DimensionTable dim = DrillConfig.get().getDimension(level.dimension());
+		if(dim != null && dim.fluid().isPresent()) {
+			FluidStack required = new FluidStack(dim.fluid().get(), dim.fluidAmount());
+			TooltipUtil.forGoggles(tooltip, Component.translatable("info.coe.drill.fluidInfo"));
+			TooltipUtil.forGoggles(tooltip, Component.translatable("info.coe.drill.needsFluid", dim.fluidAmount(), required.getHoverName()));
+			containedFluidTooltip(tooltip, isPlayerSneaking, fluidTank);
+		}
 		return true;
 	}
 
 	@Override
-	public void addToGoggleTooltip(List<Component> tooltip, R rec) {
-		rec.getDrillingFluid().ifPresent(fluid -> {
-			if (!fluid.test(fluidTank.getFluid()) || fluidTank.getFluidAmount() < fluid.getRequiredAmount()) {
-				TooltipUtil.forGoggles(tooltip, Component.translatable("info.coe.drill.noFluid"));
-			}
-		});
+	protected boolean canExtract(DimensionTable dimension) {
+		return dimension.fluid().isEmpty() ||
+				(fluidTank.getFluid().is(dimension.fluid().get()) && fluidTank.getFluidAmount() >= dimension.fluidAmount());
 	}
 
 	@Override
-	protected boolean validateRecipe(R recipe) {
-		return super.validateRecipe(recipe) && (recipe.getDrillingFluid().isEmpty() || recipe.getDrillingFluid().get().test(fluidTank.getFluid()));
-	}
-
-	@Override
-	protected boolean canExtract() {
-		return current.value().getDrillingFluid().isEmpty() ||
-				(current.value().getDrillingFluid().get().test(fluidTank.getFluid()) &&
-						fluidTank.getFluidAmount() >= current.value().getDrillingFluid().get().getRequiredAmount());
-	}
-
-	@Override
-	protected void onFinished() {
-		current.value().getDrillingFluid().ifPresent(fluid -> {
-			fluidTank.drain(fluid.getRequiredAmount(), FluidAction.EXECUTE);
-		});
-	}
-
-	protected String getTankInName() {
-		return "tank";
+	protected void onFinished(Tier tier, DimensionTable dimension) {
+		if(dimension.fluid().isPresent())
+			fluidTank.drain(dimension.fluidAmount(), FluidAction.EXECUTE);
 	}
 }

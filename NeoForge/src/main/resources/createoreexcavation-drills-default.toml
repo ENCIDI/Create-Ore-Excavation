@@ -1,0 +1,74 @@
+# Create Ore Excavation - Drilling Machine drop tables
+#
+# Every finished drilling cycle produces exactly ONE drop, picked at random from the table of the
+# dimension the machine is in, using the weights of the installed drill's tier.
+#
+#   weight  - relative weight, NOT a percent. Chance = weight / (sum of all weights of that tier in that dimension).
+#             0 or missing = this tier never drops the item.
+#   min/max - how many items drop when this entry is picked (random, inclusive). Default 1.
+#
+# Dimensions without a table can't be drilled in.
+# Reload in game with: /coe reload   (requires operator permissions)
+
+# Blocks the machine may stand on. Every block of the 3x3 area, 5 blocks deep below the machine must match.
+# Entries starting with '#' are block tags.
+drillable_ground = [
+	"#minecraft:base_stone_overworld",
+	"#minecraft:base_stone_nether",
+]
+
+# Drill tiers. The table name is the tier name used for weights below.
+#   item   - drill item that has to be inserted into the machine
+#   ticks  - length of one cycle at the minimum speed (Create's "medium" speed, 30 RPM by default);
+#            faster rotation makes the cycle proportionally shorter
+#   stress - stress impact (multiplied by RPM)
+[tiers.iron]
+item = "createoreexcavation:drill"
+ticks = 1200
+stress = 256
+
+[tiers.diamond]
+item = "createoreexcavation:diamond_drill"
+ticks = 800
+stress = 512
+
+[tiers.netherite]
+item = "createoreexcavation:netherite_drill"
+ticks = 600
+stress = 1024
+
+# Optional drilling fluid: consumed every cycle, the machine doesn't run without it.
+[dimensions."minecraft:overworld"]
+fluid = "minecraft:water"
+fluid_amount = 250
+
+# Rock makes up most of the output: 75% with the iron drill, 67% with diamond, 60% with netherite.
+[dimensions."minecraft:overworld".drops]
+"minecraft:cobblestone"            = { min = 2, max = 4, iron = 110, diamond = 76, netherite = 52 }
+"minecraft:cobbled_deepslate"      = { min = 2, max = 4, iron = 60,  diamond = 42, netherite = 28 }
+"minecraft:andesite"               = { min = 2, max = 4, iron = 50,  diamond = 35, netherite = 24 }
+"minecraft:diorite"                = { min = 2, max = 4, iron = 40,  diamond = 28, netherite = 19 }
+"minecraft:granite"                = { min = 2, max = 4, iron = 40,  diamond = 28, netherite = 19 }
+"minecraft:tuff"                   = { min = 2, max = 4, iron = 30,  diamond = 21, netherite = 14 }
+"minecraft:coal"                   = { min = 1, max = 3, iron = 30,  diamond = 25, netherite = 20 }
+"minecraft:raw_iron"               = { min = 1, max = 2, iron = 25,  diamond = 25, netherite = 20 }
+"minecraft:raw_copper"             = { min = 1, max = 3, iron = 25,  diamond = 20, netherite = 15 }
+"create:raw_zinc"                  = { min = 1, max = 2, iron = 15,  diamond = 15, netherite = 12 }
+"minecraft:raw_gold"               = {                   iron = 5,   diamond = 10, netherite = 12 }
+"minecraft:lapis_lazuli"           = { min = 2, max = 4, iron = 5,   diamond = 8,  netherite = 8 }
+"createoreexcavation:raw_redstone" = { min = 1, max = 2, iron = 5,   diamond = 8,  netherite = 8 }
+"createoreexcavation:raw_diamond"  = {                   iron = 0,   diamond = 3,  netherite = 6 }
+"createoreexcavation:raw_emerald"  = {                   iron = 0,   diamond = 1,  netherite = 3 }
+
+[dimensions."minecraft:the_nether"]
+fluid = "minecraft:lava"
+fluid_amount = 250
+
+[dimensions."minecraft:the_nether".drops]
+"minecraft:netherrack"     = { min = 2, max = 4, iron = 180, diamond = 108, netherite = 75 }
+"minecraft:blackstone"     = { min = 2, max = 4, iron = 70,  diamond = 42,  netherite = 29 }
+"minecraft:basalt"         = { min = 2, max = 4, iron = 50,  diamond = 30,  netherite = 21 }
+"minecraft:quartz"         = { min = 2, max = 4, iron = 40,  diamond = 35,  netherite = 30 }
+"minecraft:gold_nugget"    = { min = 3, max = 9, iron = 35,  diamond = 30,  netherite = 25 }
+"minecraft:glowstone_dust" = { min = 2, max = 4, iron = 25,  diamond = 25,  netherite = 25 }
+"minecraft:ancient_debris" = {                   iron = 0,   diamond = 0,   netherite = 3 }
